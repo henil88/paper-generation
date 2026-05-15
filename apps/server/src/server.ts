@@ -1,6 +1,6 @@
 import http from "node:http";
+import { env } from "@paper-generation/env/server";
 import { app } from "@/app";
-import { env } from "@/config/env";
 import { logger } from "@/lib/logger";
 
 const server = http.createServer(app);

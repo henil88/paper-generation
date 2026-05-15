@@ -1,5 +1,5 @@
+import { env } from "@paper-generation/env/server";
 import pino from "pino";
-import { env } from "@/config/env";
 
 const isDevelopment = env.NODE_ENV !== "production";
 

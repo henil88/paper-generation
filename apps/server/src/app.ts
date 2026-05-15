@@ -1,3 +1,4 @@
+import { env } from "@paper-generation/env/server";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
@@ -5,9 +6,8 @@ import express, { type Express } from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 
-import { env } from "@/config/env";
-import { httpLogger, notFoundMiddleware } from "./middlewares";
-import { errorMiddleware } from "./middlewares/error.middleware";
+import { httpLogger, notFoundMiddleware } from "@/middlewares";
+import { errorMiddleware } from "@/middlewares/error.middleware";
 
 export const app: Express = express();
 
