@@ -1,4 +1,5 @@
-import { AppSidebar } from "@/components/app-sidebar";
+"use client";
+import { AppSidebar, data } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,8 +14,9 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
-export default function Page() {
+export default function AdminDashboard() {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -26,7 +28,7 @@ export default function Page() {
               orientation="vertical"
               className="mr-2 data-vertical:h-4 data-vertical:self-auto"
             />
-            <Breadcrumb>
+            {/* <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">
@@ -38,16 +40,26 @@ export default function Page() {
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>
                 </BreadcrumbItem>
               </BreadcrumbList>
-            </Breadcrumb>
+            </Breadcrumb> */}
           </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
-            <div className="aspect-video rounded-xl bg-muted/50" />
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols">
+            {data.navMain[0].items.map((std) => (
+              <Link
+                key={std.url}
+                href={std.url}
+                className="aspect-video rounded-xl bg-muted/90 p-4 hover:bg-muted/60 transition"
+              >
+                <div className="flex h-full flex-col items-center justify-center gap-2">
+                 {std.logo}
+
+                  <h3 className="font-semibold text-xl">{std.title}</h3>
+                </div>
+              </Link>
+            ))}
           </div>
-          <div className="min-h-screen flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+          {/* <div className="min-h-screen flex-1 rounded-xl bg-muted/50 md:min-h-min" /> */}
         </div>
       </SidebarInset>
     </SidebarProvider>
