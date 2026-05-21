@@ -114,6 +114,9 @@ importers:
 
   apps/server:
     dependencies:
+      '@paper-generation/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@paper-generation/env':
         specifier: workspace:*
         version: link:../../packages/env
