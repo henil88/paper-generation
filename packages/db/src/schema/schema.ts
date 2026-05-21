@@ -17,19 +17,11 @@ import { uuidv7 } from "../utils/uuid";
 // ENUMS
 // ==========================================
 export const roleEnum = pgEnum("role", ["admin", "teacher", "student"]);
-export const questionTypeEnum = pgEnum("question_type", [
-  "mcq",
-  "fill_blank",
-  "short_answer",
-  "long_answer",
-]);
+export const questionTypeEnum = pgEnum("question_type", ["mcq", "fill_blank", "short_answer", "long_answer"]);
 export const difficultyEnum = pgEnum("difficulty", ["easy", "medium", "hard"]);
 export const paperTypeEnum = pgEnum("paper_type", ["random", "custom"]);
 export const paperStatusEnum = pgEnum("paper_status", ["draft", "published"]);
-export const attemptStatusEnum = pgEnum("attempt_status", [
-  "in_progress",
-  "completed",
-]);
+export const attemptStatusEnum = pgEnum("attempt_status", ["in_progress", "completed"]);
 
 // ==========================================
 // 1. BETTER AUTH REQUIRED TABLES & USERS
@@ -183,99 +175,155 @@ export const questionOptions = pgTable(
 // ==========================================
 // 4. PAPER GENERATION
 // ==========================================
-export const papers = pgTable("papers", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
-  createdBy: uuid("created_by").notNull().references(() => user.id),
-  classId: uuid("class_id").notNull().references(() => classes.id),
-  subjectId: uuid("subject_id").notNull().references(() => subjects.id),
-  title: text("title").notNull(),
-  paperType: paperTypeEnum("paper_type").notNull(),
-  totalMarks: integer("total_marks").notNull(),
-  status: paperStatusEnum("status").default("draft").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().$onUpdateFn(() => new Date()).notNull(),
-}, (t) => [
-  index("papers_class_subject_idx").on(t.classId, t.subjectId),
-  index("papers_created_by_idx").on(t.createdBy)
-]);
+export const papers = pgTable(
+  "papers",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    createdBy: uuid("created_by")
+      .notNull()
+      .references(() => user.id),
+    classId: uuid("class_id")
+      .notNull()
+      .references(() => classes.id),
+    subjectId: uuid("subject_id")
+      .notNull()
+      .references(() => subjects.id),
+    title: text("title").notNull(),
+    paperType: paperTypeEnum("paper_type").notNull(),
+    totalMarks: integer("total_marks").notNull(),
+    status: paperStatusEnum("status").default("draft").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdateFn(() => new Date())
+      .notNull(),
+  },
+  (t) => [index("papers_class_subject_idx").on(t.classId, t.subjectId), index("papers_created_by_idx").on(t.createdBy)],
+);
 
-export const paperSections = pgTable("paper_sections", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
-  paperId: uuid("paper_id").notNull().references(() => papers.id, { onDelete: "cascade" }),
-  title: text("title").notNull(),
-  displayOrder: integer("display_order").notNull(),
-  questionType: questionTypeEnum("question_type").notNull(),
-  marksPerQuestion: integer("marks_per_question").notNull(),
-  questionCount: integer("question_count").notNull(),
-  sectionTotalMarks: integer("section_total_marks").notNull(),
-}, (t) => [
-  index("paper_sections_paper_id_order_idx").on(t.paperId, t.displayOrder)
-]);
+export const paperSections = pgTable(
+  "paper_sections",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    paperId: uuid("paper_id")
+      .notNull()
+      .references(() => papers.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    displayOrder: integer("display_order").notNull(),
+    questionType: questionTypeEnum("question_type").notNull(),
+    marksPerQuestion: integer("marks_per_question").notNull(),
+    questionCount: integer("question_count").notNull(),
+    sectionTotalMarks: integer("section_total_marks").notNull(),
+  },
+  (t) => [index("paper_sections_paper_id_order_idx").on(t.paperId, t.displayOrder)],
+);
 
-export const paperQuestions = pgTable("paper_questions", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
-  paperId: uuid("paper_id").notNull().references(() => papers.id, { onDelete: "cascade" }),
-  sectionId: uuid("section_id").notNull().references(() => paperSections.id, { onDelete: "cascade" }),
-  questionId: uuid("question_id").notNull().references(() => questions.id),
-  displayOrder: integer("display_order").notNull(),
-}, (t) => [
-  unique().on(t.paperId, t.questionId),
-  index("paper_questions_section_idx").on(t.sectionId, t.displayOrder)
-]);
+export const paperQuestions = pgTable(
+  "paper_questions",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    paperId: uuid("paper_id")
+      .notNull()
+      .references(() => papers.id, { onDelete: "cascade" }),
+    sectionId: uuid("section_id")
+      .notNull()
+      .references(() => paperSections.id, { onDelete: "cascade" }),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id),
+    displayOrder: integer("display_order").notNull(),
+  },
+  (t) => [unique().on(t.paperId, t.questionId), index("paper_questions_section_idx").on(t.sectionId, t.displayOrder)],
+);
 
 // ==========================================
 // 5. STUDENT ATTEMPTS
 // ==========================================
-export const paperAttempts = pgTable("paper_attempts", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
-  paperId: uuid("paper_id").notNull().references(() => papers.id),
-  studentId: uuid("student_id").notNull().references(() => user.id),
-  startedAt: timestamp("started_at").defaultNow().notNull(),
-  submittedAt: timestamp("submitted_at"),
-  score: integer("score"),
-  totalMarks: integer("total_marks").notNull(),
-  status: attemptStatusEnum("status").default("in_progress").notNull(),
-}, (t) => [
-  index("paper_attempts_student_paper_idx").on(t.studentId, t.paperId)
-]);
+export const paperAttempts = pgTable(
+  "paper_attempts",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    paperId: uuid("paper_id")
+      .notNull()
+      .references(() => papers.id),
+    studentId: uuid("student_id")
+      .notNull()
+      .references(() => user.id),
+    startedAt: timestamp("started_at").defaultNow().notNull(),
+    submittedAt: timestamp("submitted_at"),
+    score: integer("score"),
+    totalMarks: integer("total_marks").notNull(),
+    status: attemptStatusEnum("status").default("in_progress").notNull(),
+  },
+  (t) => [index("paper_attempts_student_paper_idx").on(t.studentId, t.paperId)],
+);
 
-export const attemptAnswers = pgTable("attempt_answers", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
-  attemptId: uuid("attempt_id").notNull().references(() => paperAttempts.id, { onDelete: "cascade" }),
-  questionId: uuid("question_id").notNull().references(() => questions.id),
-  selectedOptionId: uuid("selected_option_id").references(() => questionOptions.id),
-  answerText: text("answer_text"),
-  isCorrect: boolean("is_correct"),
-  marksAwarded: integer("marks_awarded"),
-}, (t) => [
-  unique().on(t.attemptId, t.questionId),
-  index("attempt_answers_attempt_id_idx").on(t.attemptId)
-]);
+export const attemptAnswers = pgTable(
+  "attempt_answers",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    attemptId: uuid("attempt_id")
+      .notNull()
+      .references(() => paperAttempts.id, { onDelete: "cascade" }),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => questions.id),
+    selectedOptionId: uuid("selected_option_id").references(() => questionOptions.id),
+    answerText: text("answer_text"),
+    isCorrect: boolean("is_correct"),
+    marksAwarded: integer("marks_awarded"),
+  },
+  (t) => [unique().on(t.attemptId, t.questionId), index("attempt_answers_attempt_id_idx").on(t.attemptId)],
+);
 
 // ==========================================
 // 6. PDF EXPORTS & AUDIT
 // ==========================================
-export const paperExports = pgTable("paper_exports", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
-  paperId: uuid("paper_id").notNull().references(() => papers.id, { onDelete: "cascade" }),
-  generatedBy: uuid("generated_by").notNull().references(() => user.id),
-  fileUrl: text("file_url").notNull(),
-  fileSize: bigint("file_size", { mode: "number" }),
-  version: integer("version").default(1).notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (t) => [
-  index("paper_exports_paper_id_idx").on(t.paperId)
-]);
+export const paperExports = pgTable(
+  "paper_exports",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    paperId: uuid("paper_id")
+      .notNull()
+      .references(() => papers.id, { onDelete: "cascade" }),
+    generatedBy: uuid("generated_by")
+      .notNull()
+      .references(() => user.id),
+    fileUrl: text("file_url").notNull(),
+    fileSize: bigint("file_size", { mode: "number" }),
+    version: integer("version").default(1).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [index("paper_exports_paper_id_idx").on(t.paperId)],
+);
 
-export const auditLogs = pgTable("audit_logs", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
-  userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
-  action: text("action").notNull(),
-  entityType: text("entity_type").notNull(),
-  entityId: text("entity_id"),
-  metadata: jsonb("metadata"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-}, (t) => [
-  index("audit_logs_entity_lookup_idx").on(t.entityType, t.entityId),
-  index("audit_logs_user_created_idx").on(t.userId, t.createdAt)
-]);
+export const auditLogs = pgTable(
+  "audit_logs",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
+    action: text("action").notNull(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id"),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (t) => [
+    index("audit_logs_entity_lookup_idx").on(t.entityType, t.entityId),
+    index("audit_logs_user_created_idx").on(t.userId, t.createdAt),
+  ],
+);

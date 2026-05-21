@@ -4,12 +4,7 @@ import z, { ZodError } from "zod";
 import { logger } from "@/lib/logger";
 import { AppError } from "@/utils/AppError";
 
-export const errorMiddleware = (
-  error: unknown,
-  req: Request,
-  res: Response,
-  _next: NextFunction,
-) => {
+export const errorMiddleware = (error: unknown, req: Request, res: Response, _next: NextFunction) => {
   logger.error({ error, requestId: req.id }, "Request failed");
 
   if (error instanceof ZodError) {
