@@ -4,18 +4,41 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 
-import { subjectChapters } from "@/lib/utils";
 import { AdminBreadcrumb } from "@/components/adminComponents/AdminBreadcrumb";
 import { AdminHero } from "@/components/adminComponents/AdminHero";
 import { AdminPageLayout } from "@/components/adminComponents/AdminPageLayout";
 
-export default function Page() {
-  const { id, subject } = useParams<{
+const Chapter = () => {
+  const { id, subject, chapter } = useParams<{
     id: string;
     subject: string;
+    chapter: string;
   }>();
 
-  const chapters = subjectChapters[Number(id)]?.[subject] ?? [];
+  const decodedChapter = decodeURIComponent(chapter);
+
+  const marks = [
+    {
+      mark: 1,
+      label: "Very Short",
+      desc: "MCQ / one line questions",
+    },
+    {
+      mark: 2,
+      label: "Short",
+      desc: "Short answer questions",
+    },
+    {
+      mark: 3,
+      label: "Medium",
+      desc: "Explanation based questions",
+    },
+    {
+      mark: 5,
+      label: "Long",
+      desc: "Detailed answer questions",
+    },
+  ];
 
   return (
     <AdminPageLayout>
@@ -33,12 +56,16 @@ export default function Page() {
             label: subject,
             href: `/admin/standard/${id}/${subject}`,
           },
+          {
+            label: decodedChapter,
+            href: `/admin/standard/${id}/${subject}/${chapter}`,
+          },
         ]}
       />
 
       <AdminHero
-        title={decodeURIComponent(subject)}
-        description="Select chapter to manage questions and paper generation"
+        title={decodedChapter}
+        description="Select marks category to manage questions and paper generation"
         stats={
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div className="rounded-2xl border bg-background px-4 py-4 sm:px-5">
@@ -48,10 +75,10 @@ export default function Page() {
             </div>
 
             <div className="rounded-2xl border bg-background px-4 py-4 sm:px-5">
-              <p className="text-xs text-muted-foreground">Chapters</p>
+              <p className="text-xs text-muted-foreground">Subject</p>
 
-              <h3 className="mt-1 text-lg font-bold sm:text-xl">
-                {chapters.length}
+              <h3 className="mt-1 line-clamp-1 text-lg font-bold sm:text-xl">
+                {subject}
               </h3>
             </div>
           </div>
@@ -62,18 +89,15 @@ export default function Page() {
         className="
           grid grid-cols-1 gap-4
           sm:grid-cols-2 sm:gap-5
-          xl:grid-cols-3
-          2xl:grid-cols-4
+          xl:grid-cols-4
         "
       >
-        {chapters.map((chapter) => (
+        {marks.map((item) => (
           <Link
-            key={chapter.name}
-            href={`/admin/standard/${id}/${subject}/${encodeURIComponent(
-              chapter.name,
-            )}`}
+            key={item.mark}
+            href={`/admin/standard/${id}/${subject}/${chapter}/${item.mark}`}
             className="
-              group relative flex min-h-[320px]
+              group relative flex min-h-[300px]
               flex-col overflow-hidden rounded-3xl
               border bg-card p-5 transition-all
               duration-300 hover:-translate-y-2
@@ -84,14 +108,8 @@ export default function Page() {
             <div className="absolute right-0 top-0 h-24 w-24 rounded-full bg-primary/5 blur-2xl" />
 
             <div className="flex items-start justify-between">
-              <div
-                className="
-                  flex h-14 w-14 items-center
-                  justify-center rounded-2xl
-                  bg-primary/10 text-primary
-                "
-              >
-                <chapter.logo className="h-7 w-7" />
+              <div className="rounded-2xl bg-primary/10 px-5 py-4 text-primary">
+                <span className="text-3xl font-bold">{item.mark}</span>
               </div>
 
               <ArrowRight className="h-5 w-5 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
@@ -99,20 +117,22 @@ export default function Page() {
 
             <div className="mt-6 flex flex-1 flex-col">
               <div className="mb-3 inline-flex w-fit rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                Chapter
+                Marks Category
               </div>
 
-              <h3 className="line-clamp-2 text-lg font-semibold sm:text-xl">
-                {chapter.name}
+              <h3 className="text-xl font-semibold">
+                {item.mark} Mark Questions
               </h3>
 
-              <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
-                Manage questions, marks distribution and paper generation.
+              <p className="mt-3 text-sm text-muted-foreground">{item.label}</p>
+
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {item.desc}
               </p>
 
               <div className="mt-auto pt-6">
                 <div className="rounded-2xl bg-primary/10 px-4 py-3 text-center text-sm font-medium text-primary">
-                  Open Chapter
+                  Manage Questions
                 </div>
               </div>
             </div>
@@ -121,4 +141,6 @@ export default function Page() {
       </div>
     </AdminPageLayout>
   );
-}
+};
+
+export default Chapter;
