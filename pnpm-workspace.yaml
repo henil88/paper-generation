@@ -6,3 +6,5 @@ allowBuilds:
   msw: true
   sharp: true
   unrs-resolver: true
+overrides:
+  drizzle-orm: 0.45.2
