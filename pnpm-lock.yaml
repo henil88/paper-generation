@@ -120,9 +120,6 @@ importers:
       '@paper-generation/env':
         specifier: workspace:*
         version: link:../../packages/env
-      '@t3-oss/env-core':
-        specifier: ^0.13.11
-        version: 0.13.11(typescript@6.0.3)(zod@4.4.3)
       compression:
         specifier: ^1.8.1
         version: 1.8.1
@@ -135,6 +132,9 @@ importers:
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2
+      drizzle-orm:
+        specifier: ^0.45.2
+        version: 0.45.2
       express:
         specifier: ^5.2.1
         version: 5.2.1
@@ -11333,6 +11333,8 @@ snapshots:
       '@esbuild-kit/esm-loader': 2.6.5
       esbuild: 0.25.12
       tsx: 4.21.0
+
+  drizzle-orm@0.45.2: {}
 
   drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.20.0):
     optionalDependencies:

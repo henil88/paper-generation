@@ -1,6 +1,8 @@
+import { sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   index,
   integer,
   jsonb,
@@ -17,11 +19,19 @@ import { uuidv7 } from "../utils/uuid";
 // ENUMS
 // ==========================================
 export const roleEnum = pgEnum("role", ["admin", "teacher", "student"]);
-export const questionTypeEnum = pgEnum("question_type", ["mcq", "fill_blank", "short_answer", "long_answer"]);
+export const questionTypeEnum = pgEnum("question_type", [
+  "mcq",
+  "fill_blank",
+  "short_answer",
+  "long_answer",
+]);
 export const difficultyEnum = pgEnum("difficulty", ["easy", "medium", "hard"]);
 export const paperTypeEnum = pgEnum("paper_type", ["random", "custom"]);
 export const paperStatusEnum = pgEnum("paper_status", ["draft", "published"]);
-export const attemptStatusEnum = pgEnum("attempt_status", ["in_progress", "completed"]);
+export const attemptStatusEnum = pgEnum("attempt_status", [
+  "in_progress",
+  "completed",
+]);
 
 // ==========================================
 // 1. BETTER AUTH REQUIRED TABLES & USERS
@@ -91,23 +101,24 @@ export const verification = pgTable("verification", {
 // ==========================================
 // 2. ACADEMIC STRUCTURE
 // ==========================================
-export const classes = pgTable("classes", {
-  id: uuid("id")
-    .primaryKey()
-    .$defaultFn(() => uuidv7()),
-  name: text("name").notNull(),
-  displayOrder: integer("display_order").notNull(),
-});
+export const classes = pgTable(
+  "classes",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    name: text("name").notNull(),
+    displayOrder: integer("display_order").notNull(),
+  },
+  (t) => [
+    unique().on(t.name),
+    unique().on(t.displayOrder),
+    check("classes_display_order_positive", sql`${t.displayOrder} > 0`),
+  ],
+);
 
-export const subjects = pgTable("subjects", {
-  id: uuid("id")
-    .primaryKey()
-    .$defaultFn(() => uuidv7()),
-  name: text("name").notNull(),
-});
-
-export const classSubjects = pgTable(
-  "class_subjects",
+export const subjects = pgTable(
+  "subjects",
   {
     id: uuid("id")
       .primaryKey()
@@ -115,11 +126,32 @@ export const classSubjects = pgTable(
     classId: uuid("class_id")
       .notNull()
       .references(() => classes.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+  },
+  (t) => [
+    unique().on(t.classId, t.name),
+    index("subjects_class_id_idx").on(t.classId),
+  ],
+);
+
+export const chapters = pgTable(
+  "chapters",
+  {
+    id: uuid("id")
+      .primaryKey()
+      .$defaultFn(() => uuidv7()),
+    name: text("name").notNull(),
     subjectId: uuid("subject_id")
       .notNull()
       .references(() => subjects.id, { onDelete: "cascade" }),
+    displayOrder: integer("display_order").notNull(),
   },
-  (t) => [unique().on(t.classId, t.subjectId)],
+  (t) => [
+    unique().on(t.subjectId, t.name),
+    unique().on(t.subjectId, t.displayOrder),
+    index("chapters_subject_id_idx").on(t.subjectId),
+    check("chapters_display_order_positive", sql`${t.displayOrder} > 0`),
+  ],
 );
 
 // ==========================================
@@ -131,12 +163,9 @@ export const questions = pgTable(
     id: uuid("id")
       .primaryKey()
       .$defaultFn(() => uuidv7()),
-    classId: uuid("class_id")
+    chapterId: uuid("chapter_id")
       .notNull()
-      .references(() => classes.id),
-    subjectId: uuid("subject_id")
-      .notNull()
-      .references(() => subjects.id),
+      .references(() => chapters.id, { onDelete: "cascade" }),
     createdBy: uuid("created_by")
       .notNull()
       .references(() => user.id),
@@ -153,7 +182,12 @@ export const questions = pgTable(
       .$onUpdateFn(() => new Date())
       .notNull(),
   },
-  (t) => [index("questions_class_subject_idx").on(t.classId, t.subjectId)],
+  (t) => [
+    index("questions_chapter_id_idx").on(t.chapterId),
+    index("questions_created_by_idx").on(t.createdBy),
+    index("questions_question_type_idx").on(t.questionType),
+    check("questions_marks_positive", sql`${t.marks} > 0`),
+  ],
 );
 
 export const questionOptions = pgTable(
@@ -169,7 +203,14 @@ export const questionOptions = pgTable(
     isCorrect: boolean("is_correct").default(false).notNull(),
     displayOrder: integer("display_order").notNull(),
   },
-  (t) => [index("question_options_question_id_idx").on(t.questionId)],
+  (t) => [
+    index("question_options_question_id_idx").on(t.questionId),
+    unique().on(t.questionId, t.displayOrder),
+    check(
+      "question_options_display_order_positive",
+      sql`${t.displayOrder} > 0`,
+    ),
+  ],
 );
 
 // ==========================================
@@ -200,7 +241,11 @@ export const papers = pgTable(
       .$onUpdateFn(() => new Date())
       .notNull(),
   },
-  (t) => [index("papers_class_subject_idx").on(t.classId, t.subjectId), index("papers_created_by_idx").on(t.createdBy)],
+  (t) => [
+    index("papers_class_subject_idx").on(t.classId, t.subjectId),
+    index("papers_created_by_idx").on(t.createdBy),
+    check("papers_total_marks_positive", sql`${t.totalMarks} >= 0`),
+  ],
 );
 
 export const paperSections = pgTable(
@@ -219,7 +264,22 @@ export const paperSections = pgTable(
     questionCount: integer("question_count").notNull(),
     sectionTotalMarks: integer("section_total_marks").notNull(),
   },
-  (t) => [index("paper_sections_paper_id_order_idx").on(t.paperId, t.displayOrder)],
+  (t) => [
+    index("paper_sections_paper_id_order_idx").on(t.paperId, t.displayOrder),
+    unique().on(t.paperId, t.displayOrder),
+    check(
+      "paper_sections_marks_per_question_positive",
+      sql`${t.marksPerQuestion} > 0`,
+    ),
+    check(
+      "paper_sections_question_count_positive",
+      sql`${t.questionCount} > 0`,
+    ),
+    check(
+      "paper_sections_total_marks_positive",
+      sql`${t.sectionTotalMarks} >= 0`,
+    ),
+  ],
 );
 
 export const paperQuestions = pgTable(
@@ -239,7 +299,13 @@ export const paperQuestions = pgTable(
       .references(() => questions.id),
     displayOrder: integer("display_order").notNull(),
   },
-  (t) => [unique().on(t.paperId, t.questionId), index("paper_questions_section_idx").on(t.sectionId, t.displayOrder)],
+  (t) => [
+    unique().on(t.paperId, t.questionId),
+    unique().on(t.sectionId, t.displayOrder),
+    index("paper_questions_paper_id_idx").on(t.paperId),
+    index("paper_questions_section_idx").on(t.sectionId, t.displayOrder),
+    check("paper_questions_display_order_positive", sql`${t.displayOrder} > 0`),
+  ],
 );
 
 // ==========================================
@@ -253,7 +319,7 @@ export const paperAttempts = pgTable(
       .$defaultFn(() => uuidv7()),
     paperId: uuid("paper_id")
       .notNull()
-      .references(() => papers.id),
+      .references(() => papers.id, { onDelete: "cascade" }),
     studentId: uuid("student_id")
       .notNull()
       .references(() => user.id),
@@ -263,7 +329,11 @@ export const paperAttempts = pgTable(
     totalMarks: integer("total_marks").notNull(),
     status: attemptStatusEnum("status").default("in_progress").notNull(),
   },
-  (t) => [index("paper_attempts_student_paper_idx").on(t.studentId, t.paperId)],
+  (t) => [
+    index("paper_attempts_student_paper_idx").on(t.studentId, t.paperId),
+    check("paper_attempts_score_positive", sql`${t.score} >= 0`),
+    check("paper_attempts_total_marks_positive", sql`${t.totalMarks} >= 0`),
+  ],
 );
 
 export const attemptAnswers = pgTable(
@@ -278,12 +348,22 @@ export const attemptAnswers = pgTable(
     questionId: uuid("question_id")
       .notNull()
       .references(() => questions.id),
-    selectedOptionId: uuid("selected_option_id").references(() => questionOptions.id),
+    selectedOptionId: uuid("selected_option_id").references(
+      () => questionOptions.id,
+    ),
     answerText: text("answer_text"),
     isCorrect: boolean("is_correct"),
     marksAwarded: integer("marks_awarded"),
   },
-  (t) => [unique().on(t.attemptId, t.questionId), index("attempt_answers_attempt_id_idx").on(t.attemptId)],
+  (t) => [
+    unique().on(t.attemptId, t.questionId),
+    index("attempt_answers_attempt_id_idx").on(t.attemptId),
+    index("attempt_answers_question_id_idx").on(t.questionId),
+    check(
+      "attempt_answers_marks_awarded_positive",
+      sql`${t.marksAwarded} >= 0`,
+    ),
+  ],
 );
 
 // ==========================================
@@ -306,7 +386,11 @@ export const paperExports = pgTable(
     version: integer("version").default(1).notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (t) => [index("paper_exports_paper_id_idx").on(t.paperId)],
+  (t) => [
+    index("paper_exports_paper_id_idx").on(t.paperId),
+    check("paper_exports_version_positive", sql`${t.version} > 0`),
+    check("paper_exports_file_size_positive", sql`${t.fileSize} >= 0`),
+  ],
 );
 
 export const auditLogs = pgTable(
@@ -315,7 +399,9 @@ export const auditLogs = pgTable(
     id: uuid("id")
       .primaryKey()
       .$defaultFn(() => uuidv7()),
-    userId: uuid("user_id").references(() => user.id, { onDelete: "set null" }),
+    userId: uuid("user_id").references(() => user.id, {
+      onDelete: "set null",
+    }),
     action: text("action").notNull(),
     entityType: text("entity_type").notNull(),
     entityId: text("entity_id"),
