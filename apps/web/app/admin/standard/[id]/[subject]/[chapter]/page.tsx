@@ -1,8 +1,8 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowRight } from "lucide-react";
 
 import { AdminBreadcrumb } from "@/components/adminComponents/AdminBreadcrumb";
 import { AdminHero } from "@/components/adminComponents/AdminHero";
@@ -77,9 +77,7 @@ const Chapter = () => {
             <div className="rounded-2xl border bg-background px-4 py-4 sm:px-5">
               <p className="text-xs text-muted-foreground">Subject</p>
 
-              <h3 className="mt-1 line-clamp-1 text-lg font-bold sm:text-xl">
-                {subject}
-              </h3>
+              <h3 className="mt-1 line-clamp-1 text-lg font-bold sm:text-xl">{subject}</h3>
             </div>
           </div>
         }
@@ -120,15 +118,11 @@ const Chapter = () => {
                 Marks Category
               </div>
 
-              <h3 className="text-xl font-semibold">
-                {item.mark} Mark Questions
-              </h3>
+              <h3 className="text-xl font-semibold">{item.mark} Mark Questions</h3>
 
               <p className="mt-3 text-sm text-muted-foreground">{item.label}</p>
 
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {item.desc}
-              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.desc}</p>
 
               <div className="mt-auto pt-6">
                 <div className="rounded-2xl bg-primary/10 px-4 py-3 text-center text-sm font-medium text-primary">

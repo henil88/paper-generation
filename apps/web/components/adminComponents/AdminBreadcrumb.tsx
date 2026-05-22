@@ -11,10 +11,7 @@ export const AdminBreadcrumb = ({ items }: { items: BreadcrumbItem[] }) => (
   <div className="flex flex-wrap items-center gap-2 text-sm">
     {items.map((item, index) => (
       <Fragment key={item.href}>
-        <Link
-          href={item.href}
-          className="text-muted-foreground hover:text-primary"
-        >
+        <Link href={item.href} className="text-muted-foreground hover:text-primary">
           {item.label}
         </Link>
 

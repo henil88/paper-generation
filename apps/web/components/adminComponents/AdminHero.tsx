@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import { BookOpen } from "lucide-react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   title: string;
@@ -20,9 +20,7 @@ export const AdminHero = ({ title, description, stats }: Props) => {
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl">
-              {title}
-            </h1>
+            <h1 className="text-2xl font-bold sm:text-3xl lg:text-4xl">{title}</h1>
 
             <p className="mt-2 text-sm text-muted-foreground">{description}</p>
           </div>

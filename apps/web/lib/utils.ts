@@ -1,21 +1,21 @@
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from "clsx";
 import type { LucideIcon } from "lucide-react";
 import {
   Atom,
   Book,
+  BookOpen,
   Calculator,
   Dumbbell,
+  FlaskConical,
   Globe,
   Languages,
+  Leaf,
   Monitor,
   Palette,
-  FlaskConical,
   Sigma,
-  Leaf,
   TrendingUp,
-  BookOpen,
 } from "lucide-react";
+import { twMerge } from "tailwind-merge";
 
 //subject types
 type Subject = {

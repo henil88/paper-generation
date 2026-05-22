@@ -1,13 +1,12 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowRight } from "lucide-react";
-
-import { stdWiseSub } from "@/lib/utils";
 import { AdminBreadcrumb } from "@/components/adminComponents/AdminBreadcrumb";
 import { AdminHero } from "@/components/adminComponents/AdminHero";
 import { AdminPageLayout } from "@/components/adminComponents/AdminPageLayout";
+import { stdWiseSub } from "@/lib/utils";
 
 const Standard = () => {
   const { id } = useParams<{
@@ -45,9 +44,7 @@ const Standard = () => {
             <div className="rounded-2xl border bg-background px-4 py-4 sm:px-5">
               <p className="text-xs text-muted-foreground">Subjects</p>
 
-              <h3 className="mt-1 text-lg font-bold sm:text-xl">
-                {subjects.length}
-              </h3>
+              <h3 className="mt-1 text-lg font-bold sm:text-xl">{subjects.length}</h3>
             </div>
           </div>
         }
@@ -102,8 +99,7 @@ const Standard = () => {
                 <h3 className="text-xl font-semibold">{sub.name}</h3>
 
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  Manage chapters, questions, marks distribution and paper
-                  generation.
+                  Manage chapters, questions, marks distribution and paper generation.
                 </p>
 
                 <div className="mt-auto pt-6">

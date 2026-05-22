@@ -1,13 +1,12 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowRight } from "lucide-react";
-
-import { subjectChapters } from "@/lib/utils";
 import { AdminBreadcrumb } from "@/components/adminComponents/AdminBreadcrumb";
 import { AdminHero } from "@/components/adminComponents/AdminHero";
 import { AdminPageLayout } from "@/components/adminComponents/AdminPageLayout";
+import { subjectChapters } from "@/lib/utils";
 
 export default function Page() {
   const { id, subject } = useParams<{
@@ -50,9 +49,7 @@ export default function Page() {
             <div className="rounded-2xl border bg-background px-4 py-4 sm:px-5">
               <p className="text-xs text-muted-foreground">Chapters</p>
 
-              <h3 className="mt-1 text-lg font-bold sm:text-xl">
-                {chapters.length}
-              </h3>
+              <h3 className="mt-1 text-lg font-bold sm:text-xl">{chapters.length}</h3>
             </div>
           </div>
         }
@@ -69,9 +66,7 @@ export default function Page() {
         {chapters.map((chapter) => (
           <Link
             key={chapter.name}
-            href={`/admin/standard/${id}/${subject}/${encodeURIComponent(
-              chapter.name,
-            )}`}
+            href={`/admin/standard/${id}/${subject}/${encodeURIComponent(chapter.name)}`}
             className="
               group relative flex min-h-[320px]
               flex-col overflow-hidden rounded-3xl
@@ -102,9 +97,7 @@ export default function Page() {
                 Chapter
               </div>
 
-              <h3 className="line-clamp-2 text-lg font-semibold sm:text-xl">
-                {chapter.name}
-              </h3>
+              <h3 className="line-clamp-2 text-lg font-semibold sm:text-xl">{chapter.name}</h3>
 
               <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
                 Manage questions, marks distribution and paper generation.
