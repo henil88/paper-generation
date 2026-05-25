@@ -51,9 +51,9 @@ export const auth = betterAuth({
       create: {
         before: async (user, _ctx) => {
           const requestedRole = (user.signUpRole || "student") as Role;
-          
+
           const allowedRoles = [ROLES.STUDENT, ROLES.TEACHER];
-          
+
           if (requestedRole) {
             if (requestedRole === "admin") {
               throw new APIError("BAD_REQUEST", {
