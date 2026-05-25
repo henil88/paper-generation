@@ -30,7 +30,7 @@ const gracefulShutdown = (signal: string) => {
   server.close(async () => {
     logger.info("HTTP server closed.");
     await pool.end();
-    logger.info("Database pool closed.")
+    logger.info("Database pool closed.");
     process.exit(0);
   });
 

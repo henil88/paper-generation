@@ -19,19 +19,11 @@ import { uuidv7 } from "../utils/uuid";
 // ENUMS
 // ==========================================
 export const roleEnum = pgEnum("role", ["admin", "teacher", "student"]);
-export const questionTypeEnum = pgEnum("question_type", [
-  "mcq",
-  "fill_blank",
-  "short_answer",
-  "long_answer",
-]);
+export const questionTypeEnum = pgEnum("question_type", ["mcq", "fill_blank", "short_answer", "long_answer"]);
 export const difficultyEnum = pgEnum("difficulty", ["easy", "medium", "hard"]);
 export const paperTypeEnum = pgEnum("paper_type", ["random", "custom"]);
 export const paperStatusEnum = pgEnum("paper_status", ["draft", "published"]);
-export const attemptStatusEnum = pgEnum("attempt_status", [
-  "in_progress",
-  "completed",
-]);
+export const attemptStatusEnum = pgEnum("attempt_status", ["in_progress", "completed"]);
 
 // ==========================================
 // 1. BETTER AUTH REQUIRED TABLES & USERS
@@ -48,6 +40,10 @@ export const user = pgTable("user", {
   updatedAt: timestamp("updated_At").notNull(),
 
   role: roleEnum("role").default("student").notNull(),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires", { precision: 6, withTimezone: true }),
+
   schoolName: text("school_name"),
   phone: text("phone"),
 });
@@ -65,6 +61,7 @@ export const session = pgTable("session", {
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+  impersonatedBy: text("impersonated_by"),
 });
 
 export const account = pgTable("account", {
@@ -128,10 +125,7 @@ export const subjects = pgTable(
       .references(() => classes.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
   },
-  (t) => [
-    unique().on(t.classId, t.name),
-    index("subjects_class_id_idx").on(t.classId),
-  ],
+  (t) => [unique().on(t.classId, t.name), index("subjects_class_id_idx").on(t.classId)],
 );
 
 export const chapters = pgTable(
@@ -206,10 +200,7 @@ export const questionOptions = pgTable(
   (t) => [
     index("question_options_question_id_idx").on(t.questionId),
     unique().on(t.questionId, t.displayOrder),
-    check(
-      "question_options_display_order_positive",
-      sql`${t.displayOrder} > 0`,
-    ),
+    check("question_options_display_order_positive", sql`${t.displayOrder} > 0`),
   ],
 );
 
@@ -267,18 +258,9 @@ export const paperSections = pgTable(
   (t) => [
     index("paper_sections_paper_id_order_idx").on(t.paperId, t.displayOrder),
     unique().on(t.paperId, t.displayOrder),
-    check(
-      "paper_sections_marks_per_question_positive",
-      sql`${t.marksPerQuestion} > 0`,
-    ),
-    check(
-      "paper_sections_question_count_positive",
-      sql`${t.questionCount} > 0`,
-    ),
-    check(
-      "paper_sections_total_marks_positive",
-      sql`${t.sectionTotalMarks} >= 0`,
-    ),
+    check("paper_sections_marks_per_question_positive", sql`${t.marksPerQuestion} > 0`),
+    check("paper_sections_question_count_positive", sql`${t.questionCount} > 0`),
+    check("paper_sections_total_marks_positive", sql`${t.sectionTotalMarks} >= 0`),
   ],
 );
 
@@ -348,9 +330,7 @@ export const attemptAnswers = pgTable(
     questionId: uuid("question_id")
       .notNull()
       .references(() => questions.id),
-    selectedOptionId: uuid("selected_option_id").references(
-      () => questionOptions.id,
-    ),
+    selectedOptionId: uuid("selected_option_id").references(() => questionOptions.id),
     answerText: text("answer_text"),
     isCorrect: boolean("is_correct"),
     marksAwarded: integer("marks_awarded"),
@@ -359,10 +339,7 @@ export const attemptAnswers = pgTable(
     unique().on(t.attemptId, t.questionId),
     index("attempt_answers_attempt_id_idx").on(t.attemptId),
     index("attempt_answers_question_id_idx").on(t.questionId),
-    check(
-      "attempt_answers_marks_awarded_positive",
-      sql`${t.marksAwarded} >= 0`,
-    ),
+    check("attempt_answers_marks_awarded_positive", sql`${t.marksAwarded} >= 0`),
   ],
 );
 

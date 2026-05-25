@@ -19,8 +19,10 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@paper-generation/auth": "workspace:*",
     "@paper-generation/db": "workspace:*",
     "@paper-generation/env": "workspace:*",
+    "better-auth": "^1.6.11",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

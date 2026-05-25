@@ -1,0 +1,23 @@
+{
+  "name": "@paper-generation/auth",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "devDependencies": {
+    "@paper-generation/config": "workspace:*",
+    "@types/node": "^25.9.1"
+  },
+  "dependencies": {
+    "@better-auth/drizzle-adapter": "^1.6.11",
+    "@paper-generation/db": "workspace:*",
+    "@paper-generation/env": "workspace:*",
+    "better-auth": "^1.6.11"
+  }
+}
