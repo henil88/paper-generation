@@ -29,6 +29,11 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
+      signUpRole: {
+        type: "string",
+        input: true,
+        required: false,
+      },
       schoolName: {
         type: "string",
         required: false,
@@ -44,11 +49,11 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        before: async (user, ctx) => {
-          const requestedRole = ctx?.body?.role as Role;
-
+        before: async (user, _ctx) => {
+          const requestedRole = (user.signUpRole || "student") as Role;
+          
           const allowedRoles = [ROLES.STUDENT, ROLES.TEACHER];
-
+          
           if (requestedRole) {
             if (requestedRole === "admin") {
               throw new APIError("BAD_REQUEST", {
@@ -58,16 +63,16 @@ export const auth = betterAuth({
               throw new APIError("BAD_REQUEST", {
                 message: "Invalid role selected",
               });
-            } else {
-              user.role = requestedRole;
             }
           }
 
-          if (!user.role) {
-            user.role = ROLES.STUDENT;
-          }
-
-          return { data: user };
+          return {
+            data: {
+              ...user,
+              role: requestedRole,
+              signUpRole: null,
+            },
+          };
         },
       },
     },

@@ -44,6 +44,7 @@ export const user = pgTable("user", {
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires", { precision: 6, withTimezone: true }),
 
+	signUpRole: roleEnum("signup_role"), // temporary storage for role selection
   schoolName: text("school_name"),
   phone: text("phone"),
 });
