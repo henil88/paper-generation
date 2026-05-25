@@ -19,12 +19,15 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@paper-generation/auth": "workspace:*",
+    "@paper-generation/db": "workspace:*",
     "@paper-generation/env": "workspace:*",
-    "@t3-oss/env-core": "^0.13.11",
+    "better-auth": "^1.6.11",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",
     "helmet": "^8.1.0",

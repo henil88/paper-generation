@@ -1,5 +1,7 @@
 import http from "node:http";
+import { db, pool } from "@paper-generation/db";
 import { env } from "@paper-generation/env/server";
+import { sql } from "drizzle-orm";
 import { app } from "@/app";
 import { logger } from "@/lib/logger";
 
@@ -12,12 +14,10 @@ process.on("uncaughtException", (error) => {
 
 const startServer = async () => {
   try {
-    // connect db
-
-    const PORT = env.PORT;
-
-    server.listen(PORT, () => {
-      logger.info(`Server running in ${env.NODE_ENV} mode on port ${PORT}`);
+    await db.execute(sql`SELECT 1`);
+    logger.info("Database connected");
+    server.listen(env.PORT, () => {
+      logger.info(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
     });
   } catch (error) {
     logger.error({ error }, "Failed to start server");
@@ -27,8 +27,10 @@ const startServer = async () => {
 
 const gracefulShutdown = (signal: string) => {
   logger.info(`${signal} received. Starting graceful shutdown`);
-  server.close(() => {
+  server.close(async () => {
     logger.info("HTTP server closed.");
+    await pool.end();
+    logger.info("Database pool closed.");
     process.exit(0);
   });
 
@@ -38,7 +40,7 @@ const gracefulShutdown = (signal: string) => {
   }, 10000).unref();
 };
 
-process.on("SIGALRM", () => gracefulShutdown("SIGALRM"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 
 process.on("unhandledRejection", (reason) => {

@@ -10,9 +10,9 @@
     "dev:server": "turbo -F server dev",
     "dev:web": "turbo -F web dev",
     "db:push": "turbo -F @paper-generation/db db:push",
-    "db:studio": "turbo -F @paper-generation/db run db:studio",
-    "db:generate": "turbo -F @paper-generation/db run db:generate",
-    "db:migrate": "turbo -F @paper-generation/db run db:migrate",
+    "db:studio": "turbo -F @paper-generation/db db:studio",
+    "db:generate": "turbo -F @paper-generation/db db:generate",
+    "db:migrate": "turbo -F @paper-generation/db db:migrate",
     "check": "biome check --write ."
   },
   "devDependencies": {
