@@ -1,5 +1,15 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
-import { account, db, session, user, verification } from "@paper-generation/db";
+import { dash } from "@better-auth/infra";
+import {
+  account,
+  accountRelations,
+  db,
+  session,
+  sessionRelations,
+  user,
+  userRelations,
+  verification,
+} from "@paper-generation/db";
 import { env } from "@paper-generation/env/server";
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
@@ -8,9 +18,19 @@ import { ac, admin, student, teacher } from "./permissions";
 import { ROLES, type Role } from "./roles";
 
 export const auth = betterAuth({
+  appName: "Paper Generation",
   database: drizzleAdapter(db, {
     provider: "pg",
-    schema: { user, session, account, verification },
+    schema: {
+      user,
+      session,
+      account,
+      verification,
+      // tables relations
+      userRelations,
+      sessionRelations,
+      accountRelations,
+    },
   }),
 
   secret: env.BETTER_AUTH_SECRET,
@@ -25,6 +45,7 @@ export const auth = betterAuth({
     cookieCache: {
       enabled: true,
       maxAge: 60 * 5,
+      strategy: "jwe",
     },
   },
   user: {
@@ -78,7 +99,9 @@ export const auth = betterAuth({
     },
   },
   advanced: {
-    disableCSRFCheck: true,
+    ipAddress: {
+      ipAddressHeaders: ["cf-connecting-ip", "x-forwarded-for"],
+    },
     database: {
       generateId: false,
     },
@@ -93,5 +116,11 @@ export const auth = betterAuth({
       },
       defaultRole: ROLES.STUDENT,
     }),
+    dash({
+      apiKey: env.BETTER_AUTH_API_KEY,
+    }),
   ],
+  experimental: {
+    joins: true,
+  },
 });
