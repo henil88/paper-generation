@@ -13,8 +13,9 @@ esbuild
     outfile: "dist/server.js",
     minify: isProduction,
     treeShaking: true,
-    packages: "external",
     sourcemap: !isProduction,
-    external: ["@paper-generation/env/server", "@paper-generation/db"],
   })
-  .catch(() => process.exit(1));
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

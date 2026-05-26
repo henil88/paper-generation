@@ -12,6 +12,7 @@ import { errorMiddleware, httpLogger, notFoundMiddleware } from "@/middlewares";
 export const app: Express = express();
 
 app.disable("x-powered-by");
+app.set("trust proxy", 1);
 // requestId middleware
 app.use(httpLogger);
 app.use(helmet({ crossOriginResourcePolicy: false }));

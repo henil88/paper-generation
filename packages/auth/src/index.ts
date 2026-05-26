@@ -2,12 +2,9 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { dash } from "@better-auth/infra";
 import {
   account,
-  accountRelations,
   db,
   session,
-  sessionRelations,
   user,
-  userRelations,
   verification,
 } from "@paper-generation/db";
 import { env } from "@paper-generation/env/server";
@@ -26,10 +23,6 @@ export const auth = betterAuth({
       session,
       account,
       verification,
-      // tables relations
-      userRelations,
-      sessionRelations,
-      accountRelations,
     },
   }),
 
