@@ -10,6 +10,7 @@ export const env = createEnv({
     BETTER_AUTH_API_KEY: z.string().min(32),
     BETTER_AUTH_SECRET: z.string().min(32),
     BETTER_AUTH_URL: z.url(),
+    BETTER_AUTH_IDENTIFY_URL: z.url(),
     ALLOWED_ORIGINS: z
       .string()
       .min(1)

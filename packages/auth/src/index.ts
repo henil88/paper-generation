@@ -1,12 +1,6 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { dash } from "@better-auth/infra";
-import {
-  account,
-  db,
-  session,
-  user,
-  verification,
-} from "@paper-generation/db";
+import { account, db, session, user, verification } from "@paper-generation/db";
 import { env } from "@paper-generation/env/server";
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
@@ -65,19 +59,17 @@ export const auth = betterAuth({
       create: {
         before: async (user, _ctx) => {
           const requestedRole = (user.signUpRole || "student") as Role;
+          if (requestedRole === "admin") {
+            throw new APIError("BAD_REQUEST", {
+              message: "Cannot self-assign admin role",
+            });
+          }
 
           const allowedRoles = [ROLES.STUDENT, ROLES.TEACHER];
-
-          if (requestedRole) {
-            if (requestedRole === "admin") {
-              throw new APIError("BAD_REQUEST", {
-                message: "Cannot self-assign admin role",
-              });
-            } else if (!allowedRoles.includes(requestedRole)) {
-              throw new APIError("BAD_REQUEST", {
-                message: "Invalid role selected",
-              });
-            }
+          if (!allowedRoles.includes(requestedRole)) {
+            throw new APIError("BAD_REQUEST", {
+              message: "Invalid role selected",
+            });
           }
 
           return {
@@ -111,6 +103,7 @@ export const auth = betterAuth({
     }),
     dash({
       apiKey: env.BETTER_AUTH_API_KEY,
+      kvUrl: env.BETTER_AUTH_IDENTIFY_URL,
     }),
   ],
   experimental: {

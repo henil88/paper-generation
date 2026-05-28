@@ -29,7 +29,9 @@ export const attemptStatusEnum = pgEnum("attempt_status", ["in_progress", "compl
 // 1. BETTER AUTH REQUIRED TABLES & USERS
 // ==========================================
 export const user = pgTable("user", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
@@ -48,7 +50,9 @@ export const user = pgTable("user", {
 });
 
 export const session = pgTable("session", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
   createdAt: timestamp("created_at").notNull(),
@@ -62,7 +66,9 @@ export const session = pgTable("session", {
 });
 
 export const account = pgTable("account", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
   userId: uuid("user_id")
@@ -80,7 +86,9 @@ export const account = pgTable("account", {
 });
 
 export const verification = pgTable("verification", {
-  id: uuid("id").primaryKey().$defaultFn(() => uuidv7()),
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => uuidv7()),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
