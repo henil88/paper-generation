@@ -22,11 +22,15 @@ export const admin = ac.newRole({
 });
 
 export const teacher = ac.newRole({
+  academicStructure: ["read"],
+  questionBank: ["read"],
   paperGeneration: ["create", "update"],
   pdfExports: ["create", "update"],
 });
 
 export const student = ac.newRole({
+  academicStructure: ["read"],
+  questionBank: ["read"],
   paperGeneration: ["create", "update"],
   studentAttempts: ["create"],
   pdfExports: ["create", "update"],
