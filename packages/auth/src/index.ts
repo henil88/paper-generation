@@ -25,6 +25,8 @@ export const auth = betterAuth({
   trustedOrigins: [env.FRONTEND_URL, env.MOBILE_URL],
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: false,
+    autoSignIn: true,
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7,
