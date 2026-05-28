@@ -36,14 +36,15 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull(),
   image: text("image"),
-  createdAt: timestamp("created_At").notNull(),
-  updatedAt: timestamp("updated_At").notNull(),
+  createdAt: timestamp("created_at").notNull(),
+  updatedAt: timestamp("updated_at").notNull(),
 
   role: roleEnum("role").default("student").notNull(),
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires", { precision: 6, withTimezone: true }),
 
+  signUpRole: roleEnum("signup_role"),
   schoolName: text("school_name"),
   phone: text("phone"),
 });
