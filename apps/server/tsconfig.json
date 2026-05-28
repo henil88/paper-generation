@@ -15,7 +15,7 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "esbuild.config.mjs"],
+  "include": ["src/**/*", "types/**/*.d.ts", "esbuild.config.mjs"],
   "exclude": ["node_modules", "dist"],
   "references": []
 }
