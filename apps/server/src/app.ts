@@ -8,6 +8,7 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import { corsConfig } from "@/config/cors.config";
 import { errorMiddleware, httpLogger, notFoundMiddleware } from "@/middlewares";
+import { router as academicRouter } from "@/modules/academic/academic.route";
 
 export const app: Express = express();
 
@@ -35,6 +36,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // api requests
 app.get("/", (_, res) => res.json({ ok: true }));
+app.use("/api/academic", academicRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

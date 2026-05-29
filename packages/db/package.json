@@ -2,12 +2,9 @@
   "name": "@paper-generation/db",
   "version": "1.0.0",
   "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
+    ".": "./src/index.ts",
+    "./schema": "./src/schema/index.ts",
+    "./*": "./src/*.ts"
   },
   "scripts": {
     "db:push": "drizzle-kit push",
